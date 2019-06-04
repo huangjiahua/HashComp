@@ -13,10 +13,10 @@ struct my_numpunct : numpunct<char> {
 
 int main(int argc, const char *argv[]) {
     string ht_name = "ebr";
-    size_t thd_cnt = 4;
+    size_t thd_cnt = 12;
     size_t task_num = 1000000;
     size_t range = numeric_limits<size_t>::max();
-    size_t data_cnt = 100000;
+    size_t data_cnt = 1000000;
     if (argc > 1)
         ht_name = string(argv[1]);
     if (argc > 2) {
@@ -90,27 +90,31 @@ int main(int argc, const char *argv[]) {
         for (auto &t : threads) t.join();
         time[3] = average_time();
     } else if (ht_name == "ebr") {
-        ebr ht(thd_cnt);
+        ebr ht(thd_cnt, 10 * data_cnt);
         for (size_t i = 0; i < thd_cnt; i++) {
             threads[i] = thread(insert_func<ebr>, &ht, ref(data), thd_cnt, i);
         }
         for (auto &t : threads) t.join();
         time[0] = average_time();
+        cout << "INSERT DONE" << endl;
         for (size_t i = 0; i < thd_cnt; i++) {
             threads[i] = thread(get_func<ebr>, &ht, ref(data), thd_cnt, i, task_num);
         }
         for (auto &t : threads) t.join();
         time[1] = average_time();
+        cout << "GET    DONE" << endl;
         for (size_t i = 0; i < thd_cnt; i++) {
             threads[i] = thread(update_func<ebr>, &ht, ref(data), thd_cnt, i, ud_task);
         }
         for (auto &t : threads) t.join();
         time[2] = average_time();
+        cout << "UPDATE DONE" << endl;
         for (size_t i = 0; i < thd_cnt; i++) {
             threads[i] = thread(remove_func<ebr>, &ht, ref(data), thd_cnt, i);
         }
         for (auto &t : threads) t.join();
-        time[2] = average_time();
+        time[3] = average_time();
+        cout << "REMOVE DONE" << endl;
     }
 
     vector<double> tp(4, 0);

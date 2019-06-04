@@ -64,7 +64,7 @@ void get_func(HT *ht, const std::vector<uint64_t> &data, size_t thd_cnt, size_t 
     auto t1 = get_time();
     size_t data_cnt = data.size();
     for (size_t i = thd_idx; i < task; i += thd_cnt) {
-        auto p = ht->Get(data[i%data_cnt]);
+        volatile auto p = ht->Get(data[i%data_cnt]);
         if (p.second != 123 && p.second != 321) exit(1);
     }
     auto t2 = get_time();
